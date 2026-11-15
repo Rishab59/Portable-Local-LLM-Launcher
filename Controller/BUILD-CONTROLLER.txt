@@ -1,0 +1,58 @@
+PortableAI Controller - Build and Update Guide
+==============================================
+
+Requirements
+------------
+- Go 1.22 or newer (the module declares `go 1.22`).
+- No third-party Go modules are required by the current source.
+- End users do NOT need Go. They run the prebuilt controller executable for their platform.
+
+Source location
+---------------
+Run all Go commands from Controller/source, where go.mod is located.
+
+Run tests
+---------
+    go test ./...
+
+Build commands
+--------------
+Windows x64:
+    GOOS=windows GOARCH=amd64 go build -trimpath -ldflags="-s -w" -o ../windows-x64/portableai-controller.exe .
+
+Linux x64:
+    GOOS=linux GOARCH=amd64 go build -trimpath -ldflags="-s -w" -o ../linux-x64/portableai-controller .
+
+Linux ARM64:
+    GOOS=linux GOARCH=arm64 go build -trimpath -ldflags="-s -w" -o ../linux-arm64/portableai-controller .
+
+macOS Intel (x64):
+    GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags="-s -w" -o ../macos-x64/portableai-controller .
+
+macOS Apple Silicon (ARM64):
+    GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags="-s -w" -o ../macos-arm64/portableai-controller .
+
+Build all targets from Windows PowerShell
+-----------------------------------------
+Set the environment variables separately for each target, run the matching go build command above, then clear them before building the next target. Example:
+
+    $env:GOOS = "windows"
+    $env:GOARCH = "amd64"
+    go build -trimpath -ldflags="-s -w" -o ../windows-x64/portableai-controller.exe .
+    Remove-Item Env:GOOS
+    Remove-Item Env:GOARCH
+
+The same pattern applies to linux/amd64, linux/arm64, darwin/amd64, and darwin/arm64. Cross-compilation is supported by Go; builds do not require the target OS to be installed. Native runtime behavior still needs testing on each target OS.
+
+After changing source
+---------------------
+1. Back up the existing executable in the target platform folder.
+2. Edit the Go source in Controller/source.
+3. Run `gofmt -w *.go` from Controller/source.
+4. Run `go test ./...` and resolve failures.
+5. Build the target executable using the matching command above.
+6. Replace only the executable in the corresponding Controller/<platform> folder.
+7. Test startup, health endpoint, model scan, server launch, stop, and controller shutdown on the target OS.
+8. Keep the Go source and tests alongside the binaries for maintainability.
+
+No Go installation is required on a machine that only uses PortableAI. Do not replace or modify Runtime or Models when rebuilding the controller.

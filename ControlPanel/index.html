@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>PortableAI Control Panel</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">LOCAL INFERENCE · OFFLINE-FIRST</p>
+      <h1>PortableAI</h1>
+      <p class="subtitle">Local models, controlled by a portable runtime</p>
+    </div>
+    <div class="connection">
+      <span id="connectionDot" class="dot"></span>
+      <span id="connectionText">Connecting to controller…</span>
+    </div>
+  </header>
+
+  <aside class="sidebar" id="sidebar">
+    <button id="sidebarToggle" class="button secondary small" type="button" aria-label="Collapse navigation">☰</button>
+    <nav class="side-nav" aria-label="Main navigation">
+      <button class="nav-item active" data-view="home">Home</button>
+      <button class="nav-item" data-view="running">Running Servers</button>
+      <button class="nav-item" data-view="owned">Owned Servers</button>
+      <button class="nav-item" data-view="catalog">Model Catalog</button>
+      <button class="nav-item" data-view="setup">Initial Setup</button>
+    </nav>
+    <button id="exitControllerBtn" class="button secondary stop-controller" type="button">Stop Controller</button>
+  </aside>
+  <main id="mainContent">
+    <section class="toolbar panel" data-view="home">
+      <div>
+        <h2>System</h2>
+        <p class="muted">Detect host hardware and manually scan the Models folder. No downloads are performed.</p>
+      </div>
+      <div class="toolbar-actions">
+        <button id="detectHardwareBtn" class="button secondary">Detect hardware</button>
+        <button id="detectModelsBtn" class="button primary">Add / Detect Models</button>
+      </div>
+    </section>
+
+    <section id="hardwarePanel" class="panel hidden" data-view="home">
+      <div class="section-heading"><div><h2>Hardware report</h2><p class="muted">Detected from this computer at the time of the last scan.</p></div><div class="heading-actions"><span id="hardwareTimestamp" class="tag">Not scanned</span><button id="hardwareCollapseBtn" class="button secondary small" type="button" aria-expanded="true">Collapse details ↓</button></div></div>
+      <div id="hardwareDetails">
+      <div id="hardwareSummary" class="hardware-grid"></div>
+      <ul id="hardwareNotes" class="notes"></ul>
+      </div>
+    </section>
+
+    <div class="main-grid" data-view="home">
+      <section class="panel model-panel">
+        <div class="section-heading"><div><h2>Choose a model</h2><p class="muted">One file can appear in multiple categories without being copied.</p></div><span id="modelCount" class="tag">0 models</span></div>
+        <label for="categorySelect">Category</label>
+        <select id="categorySelect" class="control">
+          <option value="general">General</option><option value="coding">Coding</option><option value="reasoning">Reasoning</option><option value="writing">Writing</option><option value="vision">Vision</option><option value="audio">Audio</option><option value="embedding">Embedding</option><option value="uncategorized">Uncategorized</option>
+        </select>
+        <label for="modelSelect">Detected model</label>
+        <select id="modelSelect" class="control"><option value="">Detect models first</option></select>
+        <div id="modelDetails" class="details empty-state">No model selected. Put compatible GGUF files in the documented Models folder, then click Add / Detect Models.</div>
+        <div id="modelTagsEditor" class="tag-editor hidden">
+          <label>Categories (a model can have several)</label>
+          <div class="checkbox-grid" id="categoryChecks"></div>
+          <div class="custom-category-row"><input id="customCategoryInput" class="control" type="text" maxlength="32" placeholder="Add custom category (e.g. translation)"><button id="addCategoryBtn" class="button secondary small" type="button">Add category</button></div>
+          <label for="projectorSelect">Vision projector file (if required)</label>
+          <select id="projectorSelect" class="control"><option value="">No projector selected</option></select>
+          <label for="sourceCatalogSelect">Verified upstream model source</label>
+          <select id="sourceCatalogSelect" class="control"><option value="">No curated source association</option></select>
+          <p class="hint">A verified upstream license does not prove the local file's origin. Models not matched to the curated catalog remain unverified.</p>
+          <label for="modelLicense">License text (unverified unless matched to curated catalog)</label>
+          <input id="modelLicense" class="control" type="text" maxlength="100" placeholder="e.g. Apache-2.0 or Unknown">
+          <label for="modelSourceURL">Upstream source URL (reference only)</label>
+          <input id="modelSourceURL" class="control" type="url" maxlength="2048" placeholder="https://huggingface.co/…">
+          <label for="modelNotes">Notes (optional)</label>
+          <textarea id="modelNotes" class="control" rows="2" placeholder="Local notes about this model"></textarea>
+          <button id="saveMetadataBtn" class="button secondary">Save model tags and metadata</button>
+        </div>
+      </section>
+
+      <section class="panel launch-panel">
+        <div class="section-heading"><div><h2>Server settings</h2><p class="muted">Settings are saved per model on this drive.</p></div><span class="tag">Offline enforced</span></div>
+        <div class="settings-grid">
+          <div><label for="serverModeSelect">Server mode</label><select id="serverModeSelect" class="control"><option value="single">Single active model (recommended)</option><option value="concurrent">Concurrent servers</option></select></div>
+          <div><label for="portInput">Server port</label><input id="portInput" class="control" type="number" min="1" max="65535" value="8080"></div>
+          <div><label for="contextInput">Context size</label><input id="contextInput" class="control" type="number" min="512" max="1048576" step="512" value="8192"></div>
+          <div><label for="backendSelect">Compute backend</label><select id="backendSelect" class="control"><option value="auto">Auto-detect</option><option value="nvidia">NVIDIA GPU</option><option value="amd">AMD GPU</option><option value="apple">Apple GPU</option><option value="disable">CPU only</option></select></div>
+          <div><label for="gpuLayersInput">GPU layers</label><input id="gpuLayersInput" class="control" type="number" min="0" max="999" value="999"></div>
+          <div><label for="cpuThreadsInput">CPU threads (0 = runtime default)</label><input id="cpuThreadsInput" class="control" type="number" min="0" max="512" value="0"></div>
+          <div><label for="threadsBatchInput">Batch CPU threads</label><input id="threadsBatchInput" class="control" type="number" min="0" max="512" value="0"></div>
+          <div><label for="batchSizeInput">Batch size (0 = default)</label><input id="batchSizeInput" class="control" type="number" min="0" max="8192" value="0"></div>
+          <div><label for="ubatchSizeInput">Micro-batch size</label><input id="ubatchSizeInput" class="control" type="number" min="0" max="8192" value="0"></div>
+          <div><label for="parallelInput">Parallel requests</label><input id="parallelInput" class="control" type="number" min="1" max="128" value="1"></div>
+          <div><label for="flashAttentionSelect">Flash attention</label><select id="flashAttentionSelect" class="control"><option value="auto">Runtime default</option><option value="on">On</option><option value="off">Off</option></select></div>
+        </div>
+        <details class="advanced-settings"><summary>Advanced memory settings</summary>
+          <div class="checkbox-grid two-col">
+            <label class="check"><input id="noMmapInput" type="checkbox"> Disable memory mapping</label>
+            <label class="check"><input id="mlockInput" type="checkbox"> Lock model pages in RAM (mlock)</label>
+          </div>
+          <p class="hint">These options can increase memory use or fail under OS limits. Leave them off unless needed.</p>
+        </details>
+        <details class="advanced-settings">
+          <summary>KV cache and vision parameters</summary>
+          <div class="settings-grid">
+            <div><label for="cacheTypeKSelect">K cache type</label><select id="cacheTypeKSelect" class="control"><option value="">Runtime default</option><option value="f16">f16</option><option value="q8_0">q8_0</option><option value="q5_0">q5_0</option><option value="q5_1">q5_1</option><option value="q4_0">q4_0</option><option value="q4_1">q4_1</option></select></div>
+            <div><label for="cacheTypeVSelect">V cache type</label><select id="cacheTypeVSelect" class="control"><option value="">Runtime default</option><option value="f16">f16</option><option value="q8_0">q8_0</option><option value="q5_0">q5_0</option><option value="q5_1">q5_1</option><option value="q4_0">q4_0</option><option value="q4_1">q4_1</option></select></div>
+            <div><label for="imageMinTokensInput">Minimum image tokens (0 = default)</label><input id="imageMinTokensInput" class="control" type="number" min="0" max="4096" value="0"></div>
+            <div><label for="imageMaxTokensInput">Maximum image tokens (0 = default)</label><input id="imageMaxTokensInput" class="control" type="number" min="0" max="16384" value="0"></div>
+          </div>
+          <p class="hint">Image token controls only affect compatible vision models. Large values increase context and memory demand.</p>
+        </details>
+        <details class="advanced-settings">
+          <summary>Validated extra runtime arguments</summary>
+          <label for="customArgsInput">One option per line</label>
+          <textarea id="customArgsInput" class="control" rows="4" placeholder="--jinja&#10;--reasoning-format qwen3"></textarea>
+          <p class="hint">Only a small allowlist is accepted: --jinja, --no-context-shift, --no-warmup, --verbose, --metrics, and supported --reasoning-format values. Model paths, downloads, ports, API keys, GPU selection, and other protected flags cannot be overridden.</p>
+        </details>
+        <details class="advanced-settings" open>
+          <summary>Generation defaults</summary>
+          <div class="settings-grid compact-grid">
+            <div><label for="temperatureInput">Temperature</label><input id="temperatureInput" class="control" type="number" min="0" max="2" step="0.05" value="0.7"></div>
+            <div><label for="topPInput">Top-p</label><input id="topPInput" class="control" type="number" min="0" max="1" step="0.05" value="0.8"></div>
+            <div><label for="topKInput">Top-k</label><input id="topKInput" class="control" type="number" min="0" max="200" value="20"></div>
+            <div><label for="minPInput">Min-p</label><input id="minPInput" class="control" type="number" min="0" max="1" step="0.01" value="0"></div>
+            <div><label for="repeatPenaltyInput">Repeat penalty</label><input id="repeatPenaltyInput" class="control" type="number" min="0.5" max="2" step="0.05" value="1"></div>
+            <div><label for="maxTokensInput">Max output tokens</label><input id="maxTokensInput" class="control" type="number" min="1" max="32768" value="1024"></div>
+          </div>
+        </details>
+        <div class="launch-actions"><label class="check"><input id="autoPortInput" type="checkbox"> Automatically choose another port if occupied</label><div class="button-row"><button id="saveSettingsBtn" class="button secondary">Save settings</button><button id="startServerBtn" class="button primary">Start model server</button></div></div>
+        <p id="launchStatus" class="status-line" role="status"></p>
+      </section>
+    </div>
+
+    <section class="panel" data-view="owned">
+      <div class="section-heading"><div><h2>Owned servers</h2><p class="muted">Only processes started by this controller can be stopped here.</p></div><button id="refreshServersBtn" class="button secondary small">Refresh</button></div>
+      <div id="serversList" class="servers-list"><p class="empty-state">No servers are running.</p></div>
+    </section>
+
+
+    <section class="panel" data-view="running">
+      <div class="section-heading"><div><h2>Running servers</h2><p class="muted">Active servers. Stopped servers remain visible here for five seconds.</p></div><button id="refreshRunningBtn" class="button secondary small">Refresh</button></div>
+      <div id="runningServersList" class="servers-list"><p class="empty-state">No running servers.</p></div>
+    </section>
+    <section class="panel catalog-panel" data-view="catalog">
+      <div class="section-heading"><div><h2>Model catalog</h2><p class="muted">Catalog data is read from Config/model-catalog.json. Downloads are always manual.</p></div><div class="heading-actions"><span class="tag">No auto-downloads</span><button id="refreshCatalogBtn" class="button secondary small" type="button">Reload catalog</button></div></div>
+      <div id="catalogList" class="catalog-list"><p class="empty-state">Loading curated catalog…</p></div>
+    </section>
+    <section class="panel" data-view="setup"><div class="section-heading"><div><h2>Initial Setup</h2><p class="muted">Setup instructions loaded from Docs/INITIAL-SETUP.md.</p></div></div><article id="setupMarkdown" class="markdown-content">Loading setup guide…</article></section>
+    <section class="panel footer-panel" data-view="home"><p>PortableAI does not fetch models, runtimes, drivers, or dependencies. It launches local files only. Model compatibility and resource estimates are best-effort; confirm the runtime log after startup.</p><p id="runtimeInfo" class="muted"></p></section>
+  </main>
+  <dialog id="logDialog" class="log-dialog"><div class="section-heading"><h2>Server log</h2><button id="closeLogBtn" class="button secondary small" type="button">Close</button></div><pre id="logContent"></pre></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="markdown.js" defer></script>
+  <script src="app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+PortableAI configuration files
+==============================
+
+controller.json
+----------------
+Read once when the controller starts. Edit it with a plain-text editor while the controller is stopped, then restart the controller for changes to take effect.
+
+Fields:
+- host: loopback only. Allowed values: 127.0.0.1, localhost, or ::1. The controller intentionally refuses non-loopback binding.
+- port: controller dashboard/API port, integer 1-65535. Default: 8787.
+- readHeaderTimeoutSeconds: HTTP header timeout, 1-120 seconds. Default: 5.
+- readTimeoutSeconds: HTTP request read timeout, 1-600 seconds. Default: 15.
+- writeTimeoutSeconds: HTTP response write timeout, 1-600 seconds. Default: 30.
+- idleTimeoutSeconds: keep-alive idle timeout, 1-600 seconds. Default: 60.
+
+If the file is absent, built-in defaults are used. If JSON is malformed or a value is outside the allowed range, the controller exits with an error recorded in Logs/controller.log. Omitted fields use defaults. The command-line --port argument overrides the configured port.
+
+model-catalog.json
+------------------
+The Model Catalog view and catalog-to-local-model association both read this file when requested; editing it does not require rebuilding the controller. It must be a JSON array. Each entry needs a unique id and a name. Common fields:
+- id, name, repository, sourceUrl
+- license, licenseVerified (boolean), distribution (open-source, open-weights, or another descriptive value)
+- categories (array of tags), description
+- files (array: fileName, role, required, approxBytes)
+- manualSteps (array of strings), notes (array of strings)
+
+Only entries with licenseVerified=true can be associated as verified upstream-license metadata. That flag is a catalog assertion; it does not prove the origin of a local GGUF file. All downloads remain manual.
+
+settings.json and model-registry.json
+-------------------------------------
+These are maintained by PortableAI for per-model launch settings and locally detected model metadata. Back them up before manual edits. Do not change model paths to point outside the Models folder.

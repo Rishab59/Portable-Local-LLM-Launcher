@@ -1,0 +1,46 @@
+[
+  {
+    "path": "reasoning/qwen3-4b-thinking-2507.Q4_K_M.gguf",
+    "name": "qwen3-4b-thinking-2507.Q4_K_M.gguf",
+    "sizeBytes": 2497280256,
+    "modified": "2026-10-25T21:23:16+05:30",
+    "role": "model",
+    "categories": [
+      "general",
+      "reasoning"
+    ],
+    "licenseVerified": false,
+    "architecture": "qwen3",
+    "architectureRecognized": true,
+    "metadataReadable": true,
+    "quantization": "Q4_K_M"
+  },
+  {
+    "path": "vision/Qwen3-VL-2B-Instruct/mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf",
+    "name": "mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf",
+    "sizeBytes": 445053216,
+    "modified": "2026-10-25T23:19:12+05:30",
+    "role": "projector",
+    "categories": [],
+    "licenseVerified": false,
+    "architecture": "clip",
+    "architectureRecognized": true,
+    "metadataReadable": true,
+    "quantization": "Q8_0"
+  },
+  {
+    "path": "vision/Qwen3-VL-2B-Instruct/Qwen3VL-2B-Instruct-Q4_K_M.gguf",
+    "name": "Qwen3VL-2B-Instruct-Q4_K_M.gguf",
+    "sizeBytes": 1107409952,
+    "modified": "2026-10-25T23:18:30+05:30",
+    "role": "model",
+    "categories": [
+      "vision"
+    ],
+    "licenseVerified": false,
+    "architecture": "qwen3vl",
+    "architectureRecognized": true,
+    "metadataReadable": true,
+    "quantization": "Q4_K_M"
+  }
+]
