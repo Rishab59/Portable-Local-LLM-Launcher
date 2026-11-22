@@ -1,0 +1,50 @@
+# PortableAI model weights
+# Keep the Models folder and its .keep placeholders in Git.
+*.gguf
+*.gguf.*
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.model
+*.tflite
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+*.bak
+*.old
+*.part
+*.download
+*~
+
+# Runtime and application caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+
+# Virtual environments and downloaded dependencies
+.venv/
+venv/
+env/
+node_modules/
+
+# Local secrets and machine-specific environment files
+.env
+.env.*
+!.env.example
+
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Git metadata
+.git/
