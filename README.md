@@ -17,33 +17,34 @@ PortableAI is a **Windows-first** portable environment for running selected loca
 ---
 
 ## 📦 Folder Structure
+```
 PortableAI/
 ├── Config/
-│ ├── controller.json
-│ ├── model-catalog.json
-│ └── settings.json
+│   ├── controller.json
+│   ├── model-catalog.json
+│   └── settings.json
 ├── Controller/
-│ ├── source
-│ └── windows-x64/
-│ └── portableai-controller.exe
+│   ├── source
+│   └── windows-x64/
+│       └── portableai-controller.exe (will be present in Releases)
 ├── ControlPlane/
 ├── Docs/
 ├── Licenses/
 ├── Logs/
 ├── Models/
-│ ├── vision/
-│ ├── reasoning/
-│ ├── coding/
-│ ├── embedding/
-│ └── general/
+│   ├── vision/
+│   ├── reasoning/
+│   ├── coding/
+│   ├── embedding/
+│   └── general/
 ├── Runtime/
-│ └── windows-x64/
-│  └── llamafile-0.10.6.exe
+│   └── windows-x64/
+│       └── llamafile-0.10.6.exe (Refer "Technical Notes" section and download this manually)
 ├── Start-PortableAI.bat
 ├── Start-PortableAI.ps1
 ├── Stop-PortableAI.bat
 └── Stop-PortableAI.ps1
-
+```
 
 > Note: Model files (`.gguf`, `.safetensors`, etc.) are **excluded from the GitHub repository** and must be manually downloaded and placed in the `Models/` directory as nneded.
 
